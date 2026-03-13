@@ -271,37 +271,37 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
     <div class="container">
         <header class="header">
             <h1 class="logo">LỊCH THI DUY TÂN</h1>
-            <p class="tagline">Tra cuu nhanh chong - Tim kiem thong minh</p>
+            <p class="tagline">Tra cứu nhanh chóng - Tìm kiếm thông minh</p>
         </header>
 
         <div class="search-box">
             <div class="search-inputs">
                 <div class="input-group">
-                    <label for="maMon">Tim kiem</label>
-                    <input type="text" id="maMon" placeholder="Nhap ma mon, ten mon, lop...">
+                    <label for="maMon">Tìm kiếm</label>
+                    <input type="text" id="maMon" placeholder="Nhập mã môn, tên môn, lớp...">
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="refreshData()">Tai lai</button>
-                    <button class="btn btn-secondary" onclick="showAll()">Tat ca</button>
+                    <button class="btn btn-primary" onclick="refreshData()">Tải lại</button>
+                    <button class="btn btn-secondary" onclick="showAll()">Tất cả</button>
                 </div>
             </div>
             <div class="stats">
-                <div class="stat-item">TONG: <strong id="total-count">0</strong></div>
+                <div class="stat-item">TỔNG: <strong id="total-count">0</strong></div>
             </div>
         </div>
 
         <div class="results">
             <div class="results-header">
-                <h2>KET QUA</h2>
+                <h2>KẾT QUẢ</h2>
                 <span class="results-count" id="results-count">0</span>
             </div>
             <ul class="exam-list" id="exam-list">
-                <li class="no-results">Dang tai...</li>
+                <li class="no-results">Đang tải...</li>
             </ul>
         </div>
 
         <footer class="footer">
-            <p>© 2026 Duy Tan Exam Finder</p>
+            <p>© 2026 Tra cứu lịch thi Duy Tân</p>
         </footer>
     </div>
 
@@ -340,7 +340,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             resultsCount.textContent = exams.length;
 
             if (exams.length === 0) {
-                examList.innerHTML = '<li class="no-results">Khong tim thay ket qua</li>';
+                examList.innerHTML = '<li class="no-results">Không tìm thấy kết quả</li>';
                 return;
             }
 
@@ -348,7 +348,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 <li class="exam-item">
                     <div class="subject">${exam.text || exam.tenMon || ''} ${exam.maMon || ''} ${exam.maLop || ''} (${exam.thoiGian || ''})</div>
                     <a class="detail-link" href="https://pdaotao.duytan.edu.vn/EXAM_LIST_Detail/?ID=${exam.id}&lang=VN" target="_blank">
-                        Tai file Excel
+                        Tải file Excel
                     </a>
                 </li>
             `).join('');
@@ -394,7 +394,7 @@ class ExamHandler(http.server.SimpleHTTPRequestHandler):
                 }, 2000);
             </script>
             </head><body style="background:#050508;color:#00f0ff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;">
-            <h1>Dang tai lai du lieu tu web...</h1></body></html>'''
+            <h1>Đang tải lại dữ liệu từ web...</h1></body></html>'''
             self.wfile.write(msg.encode('utf-8'))
 
         elif self.path == '/data':
