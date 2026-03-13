@@ -1,0 +1,1 @@
+['Lắp Ráp & Bảo Trì Hệ Thống CR 210 (B-BB-D-F-J-L-N-P) (12:54 13/03/2026)', 'Vận Hành Hệ Thống Điện EE 362 (B) (12:53 13/03/2026)', 'Anh Văn Chuyên Ngành Điện-Điện Tử Nâng Cao ENG 382 (B-D-F-H) (12:53 13/03/2026)', 'Kỹ Thuật Điện EE 251 (B-BB-BD-D-J-L-T-V) (12:53 13/03/2026)', 'Điện Tử Công Suất EE 320 (F-H) (12:52 13/03/2026)']
