@@ -32,7 +32,7 @@ def fetch_from_web():
         try:
             url = f"{BASE_URL}?page={page}&lang=VN"
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
+            with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
                 html = response.read().decode('utf-8', errors='ignore')
 
             # Parse exams from HTML - extract raw text for each exam
@@ -70,19 +70,9 @@ def fetch_from_web():
     print(f"Total: {len(unique)} exams")
     return unique
 
-# Load exam data - try from file first, then fetch if not available
-def load_exams():
-    try:
-        with open('exams.json', 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except:
-        return None
-
-# Try to load from file first
-exams_data = load_exams()
-if exams_data is None:
-    print("No cached data, fetching from web...")
-    exams_data = fetch_from_web()
+# Always fetch fresh from web on startup
+print("Loading exam data from web...")
+exams_data = fetch_from_web()
 
 # HTML Template
 HTML_TEMPLATE = '''<!DOCTYPE html>
@@ -355,7 +345,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 
             examList.innerHTML = exams.map(exam => `
                 <li class="exam-item">
-                    <div class="subject">${exam.text}</div>
+                    <div class="subject">${exam.text || exam.tenMon || ''} ${exam.maMon || ''} ${exam.maLop || ''} (${exam.thoiGian || ''})</div>
                     <a class="detail-link" href="https://pdaotao.duytan.edu.vn/EXAM_LIST_Detail/?ID=${exam.id}&lang=VN" target="_blank">
                         Tai file Excel
                     </a>
@@ -365,11 +355,6 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 
         document.getElementById('maMon').addEventListener('input', filterExams);
         window.addEventListener('DOMContentLoaded', init);
-
-        // Auto refresh every 5 seconds
-        setInterval(function() {
-            window.location.href = '/refresh';
-        }, 5000);
     </script>
 </body>
 </html>
