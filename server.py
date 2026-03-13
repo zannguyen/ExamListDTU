@@ -10,6 +10,7 @@ import os
 import urllib.request
 import re
 import ssl
+import threading
 
 PORT = int(os.environ.get("PORT", 8888))
 BASE_URL = 'https://pdaotao.duytan.edu.vn/EXAM_LIST/Default.aspx'
@@ -368,16 +369,40 @@ class ExamHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(HTML_TEMPLATE.encode('utf-8'))
         elif self.path == '/refresh':
-            # Return loading message immediately (don't fetch in request)
-            # User can manually refresh later
+            # Fetch new data in background thread
+            def fetch_background():
+                global exams_data
+                print("Background: Fetching new data...")
+                new_data = fetch_from_web()
+                exams_data = new_data
+                print(f"Background: Loaded {len(new_data)} exams")
+
+            thread = threading.Thread(target=fetch_background)
+            thread.start()
+
+            # Return loading message
             self.send_response(200)
             self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
             msg = '''<!DOCTYPE html><html><head><meta charset="UTF-8">
-            <script>setTimeout(()=>window.location='/',2000)</script>
+            <script>
+                let checkReady = setInterval(function() {
+                    fetch('/data').then(r=>r.json()).then(d => {
+                        clearInterval(checkReady);
+                        window.location.href = '/';
+                    }).catch(e => {});
+                }, 2000);
+            </script>
             </head><body style="background:#050508;color:#00f0ff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;">
-            <h1>Dang tai lai du lieu...</h1></body></html>'''
+            <h1>Dang tai lai du lieu tu web...</h1></body></html>'''
             self.wfile.write(msg.encode('utf-8'))
+
+        elif self.path == '/data':
+            # Return current exam data as JSON
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(json.dumps(exams_data).encode('utf-8'))
         else:
             self.send_error(404)
 
