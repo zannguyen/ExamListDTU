@@ -11,7 +11,8 @@ import urllib.request
 import re
 import ssl
 
-PORT = 8888
+import os
+PORT = int(os.environ.get("PORT", 8888))
 BASE_URL = 'https://pdaotao.duytan.edu.vn/EXAM_LIST/Default.aspx'
 
 def fetch_from_web():
