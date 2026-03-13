@@ -11,7 +11,6 @@ import urllib.request
 import re
 import ssl
 
-import os
 PORT = int(os.environ.get("PORT", 8888))
 BASE_URL = 'https://pdaotao.duytan.edu.vn/EXAM_LIST/Default.aspx'
 
@@ -71,8 +70,19 @@ def fetch_from_web():
     print(f"Total: {len(unique)} exams")
     return unique
 
-# Load exam data - fetch fresh from web on startup
-exams_data = fetch_from_web()
+# Load exam data - try from file first, then fetch if not available
+def load_exams():
+    try:
+        with open('exams.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return None
+
+# Try to load from file first
+exams_data = load_exams()
+if exams_data is None:
+    print("No cached data, fetching from web...")
+    exams_data = fetch_from_web()
 
 # HTML Template
 HTML_TEMPLATE = '''<!DOCTYPE html>
@@ -373,13 +383,16 @@ class ExamHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(HTML_TEMPLATE.encode('utf-8'))
         elif self.path == '/refresh':
-            # Fetch fresh data from web
-            global exams_data
-            exams_data = fetch_from_web()
-            # Redirect back to home
-            self.send_response(302)
-            self.send_header('Location', '/')
+            # Return loading message immediately (don't fetch in request)
+            # User can manually refresh later
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
+            msg = '''<!DOCTYPE html><html><head><meta charset="UTF-8">
+            <script>setTimeout(()=>window.location='/',2000)</script>
+            </head><body style="background:#050508;color:#00f0ff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;">
+            <h1>Dang tai lai du lieu...</h1></body></html>'''
+            self.wfile.write(msg.encode('utf-8'))
         else:
             self.send_error(404)
 
